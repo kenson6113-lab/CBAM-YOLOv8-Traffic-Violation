@@ -1,0 +1,7 @@
+path: /content/master_traffic_violation_dataset
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 4
+names: ['Plate', 'WithHelmet', 'WithoutHelmet', 'TripleRiding']
