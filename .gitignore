@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.pt
+*.pth
+*.onnx
+*.engine
+runs/
+master_traffic_violation_dataset/
+*.zip
+*.tar.gz
+.venv/
+env/
+.vscode/
+.idea/
+.ipynb_checkpoints/
