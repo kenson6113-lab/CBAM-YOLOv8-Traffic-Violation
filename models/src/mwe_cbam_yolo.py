@@ -1,9 +1,8 @@
 import os
-import glob
 import cv2
 import torch
 import torch.nn as nn
-import matplotlib.pyplot as plt
+import numpy as np
 from ultralytics import YOLO
 
 
@@ -30,25 +29,36 @@ class CBAM(nn.Module):
 
 
 if __name__ == "__main__":
-    dataset_img_dir = "/content/master_traffic_violation_dataset/train/images"
-    image_files = glob.glob(os.path.join(dataset_img_dir, "*.[jJ][pP][gG]")) + \
-                  glob.glob(os.path.join(dataset_img_dir, "*.[pP][nN][gG]"))
+    print("=" * 60)
+    print("CBAM-YOLOv8 Minimal Working Example (MWE)")
+    print("=" * 60)
 
-    if image_files:
-        sample_img_path = image_files[0]
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"[1/3] Target Execution Device: {device}")
 
-        cbam_block = CBAM(channels=64)
-        dummy_tensor = torch.randn(1, 64, 80, 80)
-        cbam_output = cbam_block(dummy_tensor)
-        print(f"CBAM Output Shape: {cbam_output.shape}")
+    cbam_block = CBAM(channels=64).to(device)
+    dummy_tensor = torch.randn(1, 64, 80, 80).to(device)
+    cbam_output = cbam_block(dummy_tensor)
+    print(f"[2/3] CBAM Tensor Forward Pass Success!")
+    print(f"      Input Shape:  {list(dummy_tensor.shape)}")
+    print(f"      Output Shape: {list(cbam_output.shape)}")
 
-        model = YOLO("yolov8n.pt")
-        results = model.predict(source=sample_img_path, save=False)
+    sample_path = "samples/test_motorcycle.jpg"
 
-        annotated_frame = results[0].plot()
-        plt.figure(figsize=(10, 10))
-        plt.imshow(cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB))
-        plt.axis("off")
-        plt.show()
+    if os.path.exists(sample_path):
+        print(f"[3/3] Running YOLOv8 on repo sample image: '{sample_path}'")
+        image_source = sample_path
     else:
-        print(f"Error: No image files found in {dataset_img_dir}")
+        print(f"[3/3] Sample image not found. Fallback to synthetic image test...")
+        image_source = np.random.randint(0, 256, (640, 640, 3), dtype=np.uint8)
+
+    model = YOLO("yolov8n.pt")
+    results = model.predict(source=image_source, save=False, verbose=False)
+
+    annotated_frame = results[0].plot()
+    output_filename = "mwe_output.jpg"
+    cv2.imwrite(output_filename, annotated_frame)
+
+    print("=" * 60)
+    print(f"MWE PASSED SUCCESSFULLY: Output saved to '{output_filename}'")
+    print("=" * 60)
