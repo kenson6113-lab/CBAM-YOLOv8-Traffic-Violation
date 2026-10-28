@@ -4,4 +4,4 @@ val: valid/images
 test: test/images
 
 nc: 4
-names: ['Plate', 'WithHelmet', 'WithoutHelmet', 'TripleRiding']
+names: ['WithoutHelmet', 'TripleRiding', 'NoPlate', 'ImproperFootwear']
